@@ -92,6 +92,14 @@
 .noteTitle {
   font-size: 2rem;
   max-width: 97%;
+  display: flex;
+  flex-direction: column;
+}
+
+.noteCreatedAt {
+  font-size: 1.2rem;
+  color: rgb(51, 51, 51);
+  font-weight: normal;
 }
 
 .noteMethods {

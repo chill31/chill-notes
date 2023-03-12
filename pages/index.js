@@ -11,6 +11,20 @@ import Link from 'next/link';
 
 export default function Home() {
 
+  function formatDate() {
+
+    const date = new Date();
+
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const minutes = date.getMinutes().toString().padStart(2, '0');
+    const formattedDate = `${date.getHours()}:${minutes} ${months[date.getMonth()]}-${date.getFullYear()}`;
+    console.log(formattedDate);
+    
+
+    return formattedDate;
+
+  }
+
   const notesStorageName = 'chill-notes-app-data';
 
   const [data, setData] = useState([]);
@@ -21,10 +35,12 @@ export default function Home() {
 
     const title = document.getElementById("modal-note-title-input").value;
     const description = document.getElementById("modal-note-description-input").value;
-    console.log(title, description)
+    
+    const nowDate = new Date();
+    const formatted = `${formatDate()}`;
 
     let fnData = [...data];
-    fnData.push({ title, description });
+    fnData.push({ title, description, created: formatted });
 
     setData(fnData);
     localStorage.setItem(notesStorageName, JSON.stringify(fnData));
@@ -122,7 +138,7 @@ export default function Home() {
           {data.map((note, k) => (
 
             <div key={k} className={styles.note}>
-              <h2 className={styles.noteTitle}>{note.title}</h2>
+              <h2 className={styles.noteTitle}>{note.title}<span className={styles.noteCreatedAt}>{note.created}</span></h2>
 
               <div className={styles.noteMethods}>
                 <BsPencilSquare className={styles.noteIcon} onClick={() => openEditNoteModal(k)} />
