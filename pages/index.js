@@ -48,6 +48,9 @@ export default function Home() {
     setEditNoteModalVisible(true);
 
     document.getElementById("note-name").textContent = `(${data[index].title})`;
+
+    document.getElementById("edit-modal-note-title-input").value = data[index].title;
+    document.getElementById("edit-modal-note-description-input").value = data[index].description;
   }
 
   const editNote = () => {
