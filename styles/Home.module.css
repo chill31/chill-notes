@@ -148,6 +148,7 @@
   max-width: 100%;
   line-break: anywhere;
   overflow: auto;
+  white-space: pre-line;
 }
 
 /** MODAL CODE */

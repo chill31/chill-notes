@@ -78,8 +78,8 @@ export default function Home() {
               <h2 className={styles.noteTitle}>{note.title}<span className={styles.noteCreatedAt}>{note.created}</span></h2>
 
               <div className={styles.noteMethods}>
-                <BsTrash className={styles.noteIcon} onClick={() => deleteFromArchive(k)} />
                 <FaUndo className={styles.noteIcon} onClick={() => restoreNote(k)} />
+                <BsTrash className={styles.noteIcon} onClick={() => deleteFromArchive(k)} />
               </div>
               <span className={styles.divider}></span>
 

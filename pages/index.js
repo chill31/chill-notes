@@ -18,8 +18,6 @@ export default function Home() {
     const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     const minutes = date.getMinutes().toString().padStart(2, '0');
     const formattedDate = `${date.getHours()}:${minutes} ${months[date.getMonth()]}-${date.getFullYear()}`;
-    console.log(formattedDate);
-    
 
     return formattedDate;
 
