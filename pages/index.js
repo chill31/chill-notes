@@ -3,7 +3,7 @@ import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 
 // UI IMPORTS
-import { BsPlus, BsXLg, BsTrash, BsPencilSquare } from 'react-icons/bs'
+import { BsPlus, BsXLg, BsTrash, BsPencilSquare, BsInfoLg } from 'react-icons/bs'
 
 // HOOKS IMPORTS
 import { useEffect, useState } from 'react'
@@ -26,8 +26,10 @@ export default function Home() {
   }
 
   const notesStorageName = 'chill-notes-app-data';
+  const notesArchiveName = 'chill-notes-archive-data';
 
   const [data, setData] = useState([]);
+  const [archive, setArchive] = useState([]);
   const [newNoteModalVisible, setNewNoteModalVisible] = useState(false);
   const [editNoteModalVisible, setEditNoteModalVisible] = useState(false);
 
@@ -36,11 +38,12 @@ export default function Home() {
     const title = document.getElementById("modal-note-title-input").value;
     const description = document.getElementById("modal-note-description-input").value;
     
-    const nowDate = new Date();
     const formatted = `${formatDate()}`;
 
+    const prevDataLen = data.length;
+
     let fnData = [...data];
-    fnData.push({ title, description, created: formatted });
+    fnData.push({ title, description, created: formatted, strictCreated: new Date(), mainIndex: prevDataLen });
 
     setData(fnData);
     localStorage.setItem(notesStorageName, JSON.stringify(fnData));
@@ -52,11 +55,18 @@ export default function Home() {
   const deleteNote = (index) => {
 
     let fnData = [...data];
+    const deletedData = data[index];
+
     fnData.splice(index, 1);
 
     setData(fnData);
     localStorage.setItem(notesStorageName, JSON.stringify(fnData));
 
+    let archiveData = [...archive];
+    archiveData.push(deletedData);
+
+    setArchive(archiveData);
+    localStorage.setItem(notesArchiveName, JSON.stringify(archiveData));
   }
 
   const openEditNoteModal = (index) => {
@@ -93,7 +103,13 @@ export default function Home() {
       localStorage.setItem(notesStorageName, "[]");
     }
 
+    if(!localStorage.getItem(notesArchiveName)) {
+      localStorage.setItem(notesArchiveName, "[]");
+    }
+
     setData(JSON.parse(localStorage.getItem(notesStorageName)));
+    setArchive(JSON.parse(localStorage.getItem(notesArchiveName)));
+    
 
     const modals = document.querySelectorAll("[data-modal]");
     addEventListener("keydown", (e) => {
@@ -126,7 +142,7 @@ export default function Home() {
       <main className={styles.main}>
 
         <h1 className={styles.title}>Notes</h1>
-        <p className={styles.disclaimer}>There&apos;s a specifically designed notes app for code snippets, go to <Link className={styles.disclaimerLink} href="https://code-saver.vercel.app">code-saver.vercel.app</Link>, also made by me</p>
+        <p className={styles.disclaimer}><span>There&apos;s a specifically designed notes app for code snippets, go to <Link className={styles.disclaimerLink} href="https://code-saver.vercel.app">code-saver.vercel.app</Link>, also made by me</span><span className={styles.archiveDisclaimer}><BsInfoLg /> <span>Go to <Link className={styles.disclaimerLink} href="/archive">archive</Link> for recently deleted notes</span></span></p>
 
         <button className={styles.createNewNoteBtn} onClick={() => setNewNoteModalVisible(true)}>
           <BsPlus className={styles.btnIcon} />

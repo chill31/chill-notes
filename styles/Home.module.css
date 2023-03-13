@@ -20,11 +20,32 @@
 .disclaimer {
   font-size: 1.4rem;
   text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  max-width: 95vw;
+  gap: 1.5rem;
 }
 
 .disclaimerLink {
   color:rgb(45, 150, 255);
   text-decoration: none;
+}
+
+.disclaimer .archiveDisclaimer {
+  font-size: 1.2rem;
+  background-color: rgba(45, 150, 255, .3);
+  padding: .7rem 1.2rem;
+  border-radius: .3rem;
+  border: solid 0px transparent;
+  border-left-width: 10px;
+  border-left-color: rgb(45, 150, 255);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: .5rem;
+  width: fit-content;
 }
 
 .createNewNoteBtn {
