@@ -2,8 +2,10 @@
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 
+import ReactMarkdown from 'react-markdown';
+
 // UI IMPORTS
-import { BsPlus, BsXLg, BsTrash, BsPencilSquare, BsInfoLg } from 'react-icons/bs'
+import { BsPlus, BsXLg, BsTrash, BsPencilSquare } from 'react-icons/bs'
 
 // HOOKS IMPORTS
 import { useEffect, useState } from 'react'
@@ -15,19 +17,18 @@ export default function Home() {
 
     const date = new Date();
 
-    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const formattedDate = `${date.getHours()}:${minutes} ${months[date.getMonth()]}-${date.getFullYear()}`;
+    const formattedDate = Intl.DateTimeFormat(undefined, {
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    }).format(date);
 
     return formattedDate;
 
   }
 
   const notesStorageName = 'chill-notes-app-data';
-  const notesArchiveName = 'chill-notes-archive-data';
 
   const [data, setData] = useState([]);
-  const [archive, setArchive] = useState([]);
   const [newNoteModalVisible, setNewNoteModalVisible] = useState(false);
   const [editNoteModalVisible, setEditNoteModalVisible] = useState(false);
 
@@ -35,7 +36,7 @@ export default function Home() {
 
     const title = document.getElementById("modal-note-title-input").value;
     const description = document.getElementById("modal-note-description-input").value;
-    
+
     const formatted = `${formatDate()}`;
 
     const prevDataLen = data.length;
@@ -53,18 +54,12 @@ export default function Home() {
   const deleteNote = (index) => {
 
     let fnData = [...data];
-    const deletedData = data[index];
 
     fnData.splice(index, 1);
 
     setData(fnData);
     localStorage.setItem(notesStorageName, JSON.stringify(fnData));
 
-    let archiveData = [...archive];
-    archiveData.push(deletedData);
-
-    setArchive(archiveData);
-    localStorage.setItem(notesArchiveName, JSON.stringify(archiveData));
   }
 
   const openEditNoteModal = (index) => {
@@ -101,13 +96,7 @@ export default function Home() {
       localStorage.setItem(notesStorageName, "[]");
     }
 
-    if(!localStorage.getItem(notesArchiveName)) {
-      localStorage.setItem(notesArchiveName, "[]");
-    }
-
     setData(JSON.parse(localStorage.getItem(notesStorageName)));
-    setArchive(JSON.parse(localStorage.getItem(notesArchiveName)));
-    
 
     const modals = document.querySelectorAll("[data-modal]");
     addEventListener("keydown", (e) => {
@@ -140,7 +129,7 @@ export default function Home() {
       <main className={styles.main}>
 
         <h1 className={styles.title}>Notes</h1>
-        <p className={styles.disclaimer}><span>There&apos;s a specifically designed notes app for code snippets, go to <Link className={styles.disclaimerLink} href="https://code-saver.vercel.app">code-saver.vercel.app</Link>, also made by me</span><span className={styles.archiveDisclaimer}><BsInfoLg /> <span>Go to <Link className={styles.disclaimerLink} href="/archive">archive</Link> for recently deleted notes</span></span></p>
+        <p className={styles.disclaimer}><span>There&apos;s a specifically designed notes app for code snippets, go to <Link className={styles.disclaimerLink} href="https://code-saver.vercel.app">code-saver.vercel.app</Link>, also made by me</span></p>
 
         <button className={styles.createNewNoteBtn} onClick={() => setNewNoteModalVisible(true)}>
           <BsPlus className={styles.btnIcon} />
@@ -160,7 +149,7 @@ export default function Home() {
               </div>
               <span className={styles.divider}></span>
 
-              <p className={styles.actualNote}>{note.description}</p>
+              <ReactMarkdown className={styles.actualNote}>{note.description}</ReactMarkdown>
             </div>
 
           ))}
@@ -177,7 +166,7 @@ export default function Home() {
 
           <h2 className={styles.modalTitle}>New Note</h2>
           <input className={styles.modalInput} id="modal-note-title-input" placeholder="enter note title..." />
-          <textarea className={styles.modalInputArea} id="modal-note-description-input" placeholder="enter note description" />
+          <textarea className={styles.modalInputArea} id="modal-note-description-input" placeholder="enter note description " />
 
           <button className={styles.modalBtn} onClick={addNote}>Confirm</button>
 
@@ -193,7 +182,7 @@ export default function Home() {
 
           <h2 className={styles.modalTitle}>Edit Note<br /><span className={styles.noteName} id="note-name"></span></h2>
           <input className={styles.modalInput} id="edit-modal-note-title-input" placeholder="enter note title..." />
-          <textarea className={styles.modalInputArea} id="edit-modal-note-description-input" placeholder="enter note description" />
+          <textarea className={styles.modalInputArea} id="edit-modal-note-description-input" placeholder="enter note description " />
 
           <button className={styles.modalBtn} onClick={editNote}>Confirm</button>
 
