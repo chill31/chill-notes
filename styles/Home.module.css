@@ -131,8 +131,8 @@
 .actualNote {
   font-size: 1.2rem;
   color: rgb(28, 28, 28);
-  max-width: 100%;
   width: 100%;
+  height: 12rem;
   line-break: anywhere;
   overflow: auto;
   white-space: pre-line;
