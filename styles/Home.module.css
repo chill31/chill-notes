@@ -240,82 +240,120 @@
   border-color: transparent;
 }
 
+/* maximized note modal code */
+
+.maxModal {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, .3);
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.maxModal.hidden {
+  display: none;
+}
+
+.maxModal .modal {
+  height: calc(100% - 2rem);
+  width: calc(100% - 2rem);
+  background-color: white;
+}
+
+.maxModal .noteName {
+  font-size: 3rem;
+  text-align: center !important;
+  width: 100%;
+}
+
+.noteContent {
+  white-space: pre-wrap;
+  height: 100%;
+  border: solid 2px black;
+  width: 100%;
+  padding-left: 1rem;
+}
+
 /** MARKDOWN STYLES FOR BETTER VISIBILITY */
 
-.actualNote :where(h1, h2, h3, h4, h5, h6) {
+.actualNote :where(h1, h2, h3, h4, h5, h6), .noteContent :where(h1, h2, h3, h4, h5, h6) {
   width: 90%;
   border-bottom: solid 1px rgba(0, 0, 0, .2);
   margin-top: 1.5rem;
 }
 
-.actualNote h1 {
+.actualNote h1, .noteContent h1 {
   font-size: 2.6rem;
 }
 
-.actualNote h2 {
+.actualNote h2, .noteContent h2 {
   font-size: 2.2rem;
 }
 
-.actualNote h3 {
+.actualNote h3, .noteContent h3 {
   font-size: 2rem;
 }
 
-.actualNote h4 {
+.actualNote h4, .noteContent h4 {
   font-size: 1.6rem;
 }
 
-.actualNote h5 {
+.actualNote h5, .noteContent h5 {
   font-size: 1.4rem;
 }
 
-.actualNote h6 {
+.actualNote h6, .noteContent h6 {
   font-size: 1.2rem;
 }
 
-.actualNote hr {
+.actualNote hr, .noteContent hr {
   width: 90%;
   margin-top: 2rem;
   margin-bottom: 2rem;
 }
 
-.actualNote a {
+.actualNote a, .noteContent a {
   color: rgb(45, 150, 255);
   text-decoration: underline 2px;
 }
 
-.actualNote a:where(:hover, :focus) {
+.actualNote a:where(:hover, :focus), .noteContent a:where(:hover, :focus) {
   text-decoration: none;
 }
 
-.actualNote code {
+.actualNote code, .noteContent code {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
-.actualNote img {
+.actualNote img, .noteContent img {
   max-width: 90%;
   height: fit-content;
 }
 
-.actualNote blockquote {
+.actualNote blockquote, .noteContent blockquote {
   border-left: solid 10px rgba(0, 0, 0, 0.3);
   padding-left: 1rem;
   height: fit-content;
   border-radius: .2rem;
 }
 
-.actualNote ul li {
+.actualNote ul li, .noteContent ul li {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   gap: .3rem;
 }
 
-.actualNote ul li::before {
+.actualNote ul li::before, .noteContent ul li::before {
   content: "\2022";
   font-size: 1.7rem;
 }
 
-.actualNote ol li {
+.actualNote ol li, .noteContent ol li {
   counter-increment: ol-counter 1;
   display: flex;
   align-items: center;
@@ -323,6 +361,6 @@
   gap: .3rem;
 }
 
-.actualNote ol li::before {
+.actualNote ol li::before, .noteContent ol li::before {
   content: counter(ol-counter) ")";
 }

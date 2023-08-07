@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown';
 
 // UI IMPORTS
 import { BsPlus, BsXLg, BsTrash, BsPencilSquare } from 'react-icons/bs'
+import { CgMaximizeAlt } from 'react-icons/cg'
 
 // HOOKS IMPORTS
 import { useEffect, useState } from 'react'
@@ -31,6 +32,9 @@ export default function Home() {
   const [data, setData] = useState([]);
   const [newNoteModalVisible, setNewNoteModalVisible] = useState(false);
   const [editNoteModalVisible, setEditNoteModalVisible] = useState(false);
+  const [maxNoteModalVisible, setMaxNoteModalVisible] = useState(false);
+
+  const [maxModalMarkdownContent, setmaxModalMarkdownContent] = useState('');
 
   const addNote = () => {
 
@@ -39,10 +43,8 @@ export default function Home() {
 
     const formatted = `${formatDate()}`;
 
-    const prevDataLen = data.length;
-
     let fnData = [...data];
-    fnData.push({ title, description, created: formatted, strictCreated: new Date(), mainIndex: prevDataLen });
+    fnData.push({ title, description, created: formatted, });
 
     setData(fnData);
     localStorage.setItem(notesStorageName, JSON.stringify(fnData));
@@ -88,6 +90,18 @@ export default function Home() {
 
     setEditNoteModalVisible(false);
 
+  }
+
+  const maximizeNote = (index) => {
+    const noteTitle = data[index].title;
+    const noteContent = data[index].description;
+    
+    const modalTitle = document.getElementById("max-modal-note-title");
+
+    modalTitle.textContent = noteTitle;
+    setmaxModalMarkdownContent(noteContent);
+
+    setMaxNoteModalVisible(true);
   }
 
   useEffect(() => {
@@ -146,6 +160,8 @@ export default function Home() {
               <div className={styles.noteMethods}>
                 <BsPencilSquare className={styles.noteIcon} onClick={() => openEditNoteModal(k)} />
                 <BsTrash className={styles.noteIcon} onClick={() => deleteNote(k)} />
+                <CgMaximizeAlt className={styles.noteIcon} onClick={() => maximizeNote(k)} />
+
               </div>
               <span className={styles.divider}></span>
 
@@ -186,6 +202,17 @@ export default function Home() {
 
           <button className={styles.modalBtn} onClick={editNote}>Confirm</button>
 
+        </div>
+
+      </div>
+
+      <div className={`${styles.maxModal} ${maxNoteModalVisible ? '' : styles.hidden}`}>
+
+        <div className={styles.modal}>
+          <BsXLg className={styles.modalClose} onClick={() => setMaxNoteModalVisible(false)} />
+
+          <h2 className={styles.noteName} id="max-modal-note-title"></h2>
+          <ReactMarkdown className={styles.noteContent} id="max-modal-note-content">{maxModalMarkdownContent}</ReactMarkdown>
         </div>
 
       </div>
