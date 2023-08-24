@@ -120,7 +120,6 @@ export default function Home() {
         uuid: uuidv4()
       })
     }).then(d => d.json()).then(data => {
-      console.log(data.uuid);
       setSharePopupVisible(true);
       setSharePopupLink(data.uuid);
     });

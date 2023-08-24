@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export default async function handler(req, res) {
-  console.log(req.body);
+  .log(req.body);
 
   const recievedData = JSON.parse(req.body);
   const createdNote = await prisma.note.create({

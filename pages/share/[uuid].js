@@ -15,7 +15,6 @@ export default function Share({ returned }) {
     } else {
       setContent(['Shared Note', 'The note has been stored in the web'])
       const data = JSON.parse(returned.msg);
-      console.log(typeof data);
       let currentNotes = JSON.parse(localStorage.getItem("chill-notes-app-data"));
       if (currentNotes === null) {
         localStorage.setItem("chill-notes-app-data", []);
