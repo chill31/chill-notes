@@ -4,8 +4,10 @@ import styles from '../styles/Home.module.css'
 
 import ReactMarkdown from 'react-markdown';
 
+import { v4 as uuidv4 } from 'uuid';
+
 // UI IMPORTS
-import { BsPlus, BsXLg, BsTrash, BsPencilSquare } from 'react-icons/bs'
+import { BsPlus, BsXLg, BsTrash, BsPencilSquare, BsShare, BsClipboard } from 'react-icons/bs'
 import { CgMaximizeAlt } from 'react-icons/cg'
 
 // HOOKS IMPORTS
@@ -33,6 +35,9 @@ export default function Home() {
   const [newNoteModalVisible, setNewNoteModalVisible] = useState(false);
   const [editNoteModalVisible, setEditNoteModalVisible] = useState(false);
   const [maxNoteModalVisible, setMaxNoteModalVisible] = useState(false);
+
+  const [sharePopupVisible, setSharePopupVisible] = useState(false);
+  const [sharePopupLink, setSharePopupLink] = useState('');
 
   const [maxModalMarkdownContent, setmaxModalMarkdownContent] = useState('');
 
@@ -95,13 +100,31 @@ export default function Home() {
   const maximizeNote = (index) => {
     const noteTitle = data[index].title;
     const noteContent = data[index].description;
-    
+
     const modalTitle = document.getElementById("max-modal-note-title");
 
     modalTitle.textContent = noteTitle;
     setmaxModalMarkdownContent(noteContent);
 
     setMaxNoteModalVisible(true);
+  }
+
+  async function shareNote(index) {
+
+    fetch("/api/share", {
+      method: 'POST',
+      body: JSON.stringify({
+        content: data[index].description,
+        title: data[index].title,
+        created: data[index].created.toString(),
+        uuid: uuidv4()
+      })
+    }).then(d => d.json()).then(data => {
+      console.log(data.uuid);
+      setSharePopupVisible(true);
+      setSharePopupLink(data.uuid);
+    });
+
   }
 
   useEffect(() => {
@@ -161,6 +184,7 @@ export default function Home() {
                 <BsPencilSquare className={styles.noteIcon} onClick={() => openEditNoteModal(k)} />
                 <BsTrash className={styles.noteIcon} onClick={() => deleteNote(k)} />
                 <CgMaximizeAlt className={styles.noteIcon} onClick={() => maximizeNote(k)} />
+                <BsShare className={styles.noteIcon} onClick={() => shareNote(k)} />
 
               </div>
               <span className={styles.divider}></span>
@@ -216,6 +240,25 @@ export default function Home() {
         </div>
 
       </div>
+
+      <div className={`${styles.sharePopup} ${sharePopupVisible ? '' : styles.hidden}`}>
+
+        <div className={styles.modal}>
+          <BsXLg className={styles.modalClose} onClick={() => setSharePopupVisible(false)} />
+
+          <h2 className={styles.modalTitle}>Generated Link</h2>
+          <p className={styles.modalBrief}>
+            Your note is ready for one-time share. Provide the given link to anyone for them to recieve this note
+            <br /><br />
+            <span className={styles.shareModalGivenLink}>
+              <BsClipboard className={styles.shareModalGivenLinkCopy} onClick={() => { navigator.clipboard.writeText(`https://chill-notes.vercel.app/share/${sharePopupLink}`) }} />
+              {`https://chill-notes.vercel.app/share/${sharePopupLink}`}
+            </span>
+          </p>
+        </div>
+
+      </div>
+
     </div>
   )
 }

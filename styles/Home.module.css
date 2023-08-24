@@ -278,6 +278,50 @@
   padding-left: 1rem;
 }
 
+/* share modal code */
+
+.sharePopup {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, .3);
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.sharePopup.hidden {
+  display: none;
+}
+
+.sharePopup .modal {
+  height: 75%;
+  width: 50rem;
+  max-width: calc(100% - 2rem); 
+  background-color: white;
+}
+
+.sharePopup .modalTitle {
+  line-break: normal;
+}
+
+.shareModalGivenLink {
+  color: #2d96ff;
+  font-size: 1.2rem !important;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-basis: content;
+  gap: 1ch;
+}
+
+.shareModalGivenLinkCopy {
+  color: black;
+  cursor: pointer;
+}
+
 /** MARKDOWN STYLES FOR BETTER VISIBILITY */
 
 .actualNote :where(h1, h2, h3, h4, h5, h6), .noteContent :where(h1, h2, h3, h4, h5, h6) {
@@ -317,7 +361,7 @@
 }
 
 .actualNote a, .noteContent a {
-  color: rgb(45, 150, 255);
+  color: #2d96ff;
   text-decoration: underline 2px;
 }
 

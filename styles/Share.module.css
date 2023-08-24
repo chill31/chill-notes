@@ -1,0 +1,19 @@
+.container {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+  min-height: 650px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  flex-direction: column;
+}
+
+.homeBtn {
+  background-color: #2d96ff;
+  color: black;
+  padding: .4rem .8rem;
+  text-decoration: none;
+  border-radius: .3rem;
+}
