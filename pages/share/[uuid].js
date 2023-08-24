@@ -53,7 +53,7 @@ export default function Share({ returned }) {
 }
 
 export async function getServerSideProps(context) {
-  const res = await fetch('http://localhost:3000/api/checkshare', {
+  const res = await fetch('https://chill-notes.vercel.app/api/checkshare', {
     method: 'POST',
     body: JSON.stringify({ uuid: context.params.uuid })
   });
