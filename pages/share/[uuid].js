@@ -82,7 +82,7 @@ export async function getServerSideProps(context) {
       }
     }
   } else {
-    const res = await fetch('https://chill-notes.vercel.app/api/checkshare', {
+    const res = await fetch(process.env.URL + '/api/checkshare', {
       method: 'POST',
       body: JSON.stringify({ uuid: context.params.uuid })
     });
@@ -96,7 +96,7 @@ export async function getServerSideProps(context) {
       }
     } else {
 
-      const removeSharedNote = await fetch('https://chill-notes.vercel.app/api/removeshare', {
+      const removeSharedNote = await fetch(process.env.URL + '/api/removeshare', {
         method: 'POST',
         body: JSON.stringify({ uuid: context.params.uuid })
       });
