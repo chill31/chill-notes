@@ -1,3 +1,14 @@
+# CONTRIBUTORS
+only 1 contributor (except the author, of course)
+<br>
+It is:
+
+## Satindar
+Go to his [github profile](https://github.com/Satindar31) <br>
+Helped the most (95%) with backend, because I did not know any backend till right now, and he helped me with starting prisma and the database with next.js.
+
+<br><br><br><br><br>
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
