@@ -53,7 +53,6 @@ export default function Share({ returned }) {
 
 export async function getServerSideProps(context) {
 
-  console.log('server: ' + process.env.ENVIRONMENT)
   if (process.env.ENVIRONMENT === 'dev') {
     const res = await fetch('http://localhost:3000/api/checkshare', {
       method: 'POST',
