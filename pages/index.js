@@ -36,10 +36,13 @@ export default function Home() {
   const [editNoteModalVisible, setEditNoteModalVisible] = useState(false);
   const [maxNoteModalVisible, setMaxNoteModalVisible] = useState(false);
 
+  const [maxModalMarkdownContent, setmaxModalMarkdownContent] = useState('');
+
   const [sharePopupVisible, setSharePopupVisible] = useState(false);
   const [sharePopupLink, setSharePopupLink] = useState('');
 
-  const [maxModalMarkdownContent, setmaxModalMarkdownContent] = useState('');
+  const [shareTitleContent, setShareTitleContent] = useState('Generating...');
+  const [shareBriefContent, setShareBriefContent] = useState('');
 
   const addNote = () => {
 
@@ -111,6 +114,11 @@ export default function Home() {
 
   async function shareNote(index) {
 
+    setSharePopupVisible(true);
+    setSharePopupLink('');
+    setShareBriefContent('');
+    setShareTitleContent('Generating...')
+
     fetch("/api/share", {
       method: 'POST',
       body: JSON.stringify({
@@ -120,7 +128,8 @@ export default function Home() {
         uuid: uuidv4()
       })
     }).then(d => d.json()).then(data => {
-      setSharePopupVisible(true);
+      setShareTitleContent('Generated Link');
+      setShareBriefContent('render the content.');
       setSharePopupLink(data.uuid);
     });
 
@@ -245,14 +254,22 @@ export default function Home() {
         <div className={styles.modal}>
           <BsXLg className={styles.modalClose} onClick={() => setSharePopupVisible(false)} />
 
-          <h2 className={styles.modalTitle}>Generated Link</h2>
+          <h2 className={styles.modalTitle}>{shareTitleContent}</h2>
           <p className={styles.modalBrief}>
-            Your note is ready for one-time share. Provide the given link to anyone for them to recieve this note
-            <br /><br />
-            <span className={styles.shareModalGivenLink}>
-              <BsClipboard className={styles.shareModalGivenLinkCopy} onClick={() => { navigator.clipboard.writeText(`https://chill-notes.vercel.app/share/${sharePopupLink}`) }} />
-              {`https://chill-notes.vercel.app/share/${sharePopupLink}`}
-            </span>
+
+            {
+              shareBriefContent === '' ?
+                <span className={styles.modalRenderedParagraph}>creating a link for you...</span> :
+                <span className={styles.modalRenderedParagraph}>
+                  Your note is ready to share with anyone. Provide the given link to anyone for them to recieve this note
+                  <br /><br />
+                  <span className={styles.shareModalGivenLink}>
+                    <BsClipboard className={styles.shareModalGivenLinkCopy} onClick={() => { navigator.clipboard.writeText(`https://chill-notes.vercel.app/share/${sharePopupLink}`) }} />
+                    {`https://chill-notes.vercel.app/share/${sharePopupLink}`}
+                  </span>
+                </span>
+            }
+
           </p>
         </div>
 
