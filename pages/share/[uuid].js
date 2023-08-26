@@ -52,33 +52,17 @@ export default function Share({ returned }) {
 }
 
 export async function getServerSideProps(context) {
-  const environment = 'production';
 
-  if (environment === 'dev') {
+  console.log('server: ' + process.env.ENVIRONMENT)
+  if (process.env.ENVIRONMENT === 'dev') {
     const res = await fetch('http://localhost:3000/api/checkshare', {
       method: 'POST',
       body: JSON.stringify({ uuid: context.params.uuid })
     });
     const returned = await res.json();
-
-    if (returned.msg === 'failed') {
-      return {
-        props: {
-          returned
-        }
-      }
-    } else {
-
-      const removeSharedNote = await fetch('http://localhost:3000/api/removeshare', {
-        method: 'POST',
-        body: JSON.stringify({ uuid: context.params.uuid })
-      });
-      const removeData = await removeSharedNote.json();
-
-      return {
-        props: {
-          returned
-        }
+    return {
+      props: {
+        returned
       }
     }
   } else {
@@ -87,25 +71,9 @@ export async function getServerSideProps(context) {
       body: JSON.stringify({ uuid: context.params.uuid })
     });
     const returned = await res.json();
-
-    if (returned.msg === 'failed') {
-      return {
-        props: {
-          returned
-        }
-      }
-    } else {
-
-      const removeSharedNote = await fetch('https://chill-notes.vercel.app/api/removeshare', {
-        method: 'POST',
-        body: JSON.stringify({ uuid: context.params.uuid })
-      });
-      const removeData = await removeSharedNote.json();
-
-      return {
-        props: {
-          returned
-        }
+    return {
+      props: {
+        returned
       }
     }
   }
