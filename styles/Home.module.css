@@ -10,7 +10,7 @@
   overflow-x: hidden !important;
 }
 
-.title {
+.title, .contentTitle {
   text-align: center;
   position: relative;
   top: 2rem;
@@ -33,7 +33,15 @@
   text-decoration: none;
 }
 
-.createNewNoteBtn {
+.btnContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.createNewNoteBtn, .contentNewNoteBtn {
   padding: .7rem 1.3rem;
   font-size: 1.3rem;
   display: flex;
@@ -48,10 +56,15 @@
   transition-property: background-color, color, border-color;
 }
 
-.createNewNoteBtn:where(:hover, :focus) {
+.createNewNoteBtn:where(:hover, :focus), .contentNewNoteBtn:where(:hover, :focus) {
   background-color: black;
   color: white;
   border-color: transparent;
+}
+
+.contentNewNoteBtn {
+  margin-top: 3rem;
+  margin-bottom: 3rem;
 }
 
 .btnIcon {
@@ -60,7 +73,7 @@
 
 /** ACTUAL STYLES NOW **/
 
-.notesContainer {
+.notesContainer, .contentNoteContainer {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -70,10 +83,10 @@
   place-items: center;
   position: relative;
   top: 2rem;
-  gap: 2rem;
+  gap: 2.5rem;
 }
 
-.note {
+.note, .category {
   --padding: 2rem;
 
   width: 22rem;
@@ -90,10 +103,45 @@
   overflow: hidden;
 }
 
-@media (max-width: 800px) {
-  .note {
+.category {
+  background-color: rgb(215, 208, 147);
+  position: relative;
+  overflow: visible !important;
+  cursor: pointer;
+}
+
+.category::before {
+  content: '';
+  position: absolute;
+  top: -2rem;
+  left: 0;
+  height: 3rem;
+  width: 5rem;
+  background-color: rgb(215, 208, 147);
+  border-radius: .7rem;
+}
+
+.category::after {
+  content: '';
+  position: absolute;
+  top: -2.2rem;
+  left: 4rem;
+  height: 4rem;
+  width: 2rem;
+  transform: rotate(-45deg);
+  background-color: rgb(215, 208, 147);
+  border-radius: .7rem;
+}
+
+@media (max-width: 810px) {
+  .note, .category {
     width: calc(100vw - var(--padding));
   }
+}
+
+.categoryDisclaimer {
+  font-size: 1.7rem;
+  color: rgb(72, 72, 72);
 }
 
 .noteTitle {
@@ -126,6 +174,11 @@
   background-color: rgba(0, 0, 0, .2);
   height: 2px;
   width: 100%;
+}
+
+.modalCategoryName {
+  font-size: 1.1rem;
+  font-weight: 400;
 }
 
 .actualNote {
@@ -411,4 +464,43 @@
 
 .actualNote ol li::before, .noteContent ol li::before {
   content: counter(ol-counter) ")";
+}
+
+.categoryContent {
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: flex-start;
+  padding-top: 2rem;
+  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: scroll;
+  background-color: white;
+}
+
+.categoryContent[data-hidden] {
+  display: none;
+}
+
+.categorybackHome {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  cursor: pointer;
+  font-size: 2rem;
+}
+
+.contentBrief {
+  font-size: 1.3rem;
+  text-align: center;
+  max-width: 95vw;
+  margin-top: 2rem;
+}
+
+.contentNoteContainer {
+  margin-bottom: 2rem;
 }
