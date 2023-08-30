@@ -98,7 +98,7 @@ export default function Home() {
 
     const index = Number(document.getElementById("edit-note-modal").getAttribute("data-index"));
 
-    let fnData = [...data];
+    let fnData = {...data};
     fnData.notes[index].title = title;
     fnData.notes[index].description = description;
 
