@@ -15,9 +15,9 @@ export default function Share({ returned }) {
     } else {
       setContent(['Shared Note', 'The note has been stored in the web'])
       const data = JSON.parse(returned.msg);
-      let currentNotes = JSON.parse(localStorage.getItem("chill-notes-app-data")).notes;
+      let currentNotes = JSON.parse(localStorage.getItem("chill-notes-data")).notes;
       if (currentNotes === null) {
-        localStorage.setItem("chill-notes-app-data", "{ notes: [], categories: [] }");
+        localStorage.setItem("chill-notes-data", "{ notes: [], categories: [] }");
         currentNotes = [];
       }
 
@@ -32,7 +32,7 @@ export default function Share({ returned }) {
         created: formattedDate,
       });
 
-      localStorage.setItem("chill-notes-app-data", JSON.stringify({ notes: currentNotes, categories: JSON.parse(localStorage.getItem("chill-notes-app-data")).categories }));
+      localStorage.setItem("chill-notes-data", JSON.stringify({ notes: currentNotes, categories: JSON.parse(localStorage.getItem("chill-notes-data")).categories }));
     }
   }, [returned.msg]);
 

@@ -8,5 +8,6 @@ export default async function handler(req, res) {
     data: recievedData
   });
 
+
   res.status(200).json({ uuid: recievedData.uuid });
 }
