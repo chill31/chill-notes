@@ -1,3 +1,7 @@
+export const config = {
+  runtime: 'edge',
+};
+
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
