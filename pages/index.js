@@ -7,7 +7,7 @@ import ReactMarkdown from 'react-markdown';
 import { v4 as uuidv4 } from 'uuid';
 
 // UI IMPORTS
-import { BsPlus, BsXLg, BsTrash, BsPencilSquare, BsShare, BsClipboard, BsArrowLeft } from 'react-icons/bs'
+import { BsPlus, BsXLg, BsTrash, BsPencilSquare, BsShare, BsClipboard, BsArrowLeft, BsCheck2, BsHouse, BsFolder } from 'react-icons/bs'
 import { CgMaximizeAlt } from 'react-icons/cg'
 
 // HOOKS IMPORTS
@@ -32,12 +32,17 @@ export default function Home() {
   const notesStorageName = 'chill-notes-data';
 
   const [data, setData] = useState({ notes: [], categories: [] });
+
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedNotes, setSelectedNotes] = useState([]);
+
+  const [moveModalVisible, setMoveModalVisible] = useState(false);
+
   const [newNoteModalVisible, setNewNoteModalVisible] = useState(false);
   const [editNoteModalVisible, setEditNoteModalVisible] = useState(false);
   const [maxNoteModalVisible, setMaxNoteModalVisible] = useState(false);
 
   const [maxModalMarkdownContent, setmaxModalMarkdownContent] = useState('');
-
   const [categoryNoteMaxModalMarkdownContent, setCategoryNoteMaxModalMarkdownContent] = useState('');
   const [maxCategoryNoteModalVisible, setMaxCategoryNoteModalVisible] = useState(false);
 
@@ -64,7 +69,7 @@ export default function Home() {
     const formatted = `${formatDate()}`;
 
     let fnData = { ...data };
-    fnData.notes.push({ title, description, created: formatted, });
+    fnData.notes.push({ title, description, created: formatted, strictCreated: Date.now() });
 
     setData(fnData);
     localStorage.setItem(notesStorageName, JSON.stringify(fnData));
@@ -98,7 +103,7 @@ export default function Home() {
 
     const index = Number(document.getElementById("edit-note-modal").getAttribute("data-index"));
 
-    let fnData = {...data};
+    let fnData = { ...data };
     fnData.notes[index].title = title;
     fnData.notes[index].description = description;
 
@@ -249,7 +254,7 @@ export default function Home() {
     const formatted = `${formatDate()}`;
 
     let fnData = { ...data };
-    fnData.categories[categoryIndex].notes.push({ title, description, created: formatted, });
+    fnData.categories[categoryIndex].notes.push({ title, description, created: formatted, strictCreated: Date.now() });
 
     setData(fnData);
     localStorage.setItem(notesStorageName, JSON.stringify(fnData));
@@ -304,6 +309,134 @@ export default function Home() {
     setMaxCategoryNoteModalVisible(true);
   }
 
+  // selection functions
+
+  function unCheckNotes() {
+    const selectNoteCheckboxes = document.querySelectorAll('input[type="checkbox"][data-select-note-checkbox]');
+    selectNoteCheckboxes.forEach((box) => {
+      box.checked = false;
+    });
+  }
+
+  function setSelectModeFn() {
+    unCheckNotes();
+
+    if (selectMode === true) {
+      setSelectedNotes([])
+    } else {
+      // do nothing.
+    }
+    setSelectMode(prev => !prev);
+  }
+
+  function addSelectedNote(event, note, noteIndex, categoryIndex) {
+    if (categoryIndex === -1) {
+      const checked = event.target.checked;
+      if (checked === true) {
+        setSelectedNotes((prevSelectedNotes) => [
+          ...prevSelectedNotes,
+          {
+            title: note.title,
+            description: note.description,
+            created: note.created,
+            index: noteIndex,
+            categoryIndex: categoryIndex,
+            strictCreated: note.strictCreated
+          },
+        ]);
+      } else {
+        setSelectedNotes((prevSelectedNotes) =>
+          prevSelectedNotes.filter(
+            (selectedNote) =>
+              selectedNote.index !== noteIndex || selectedNote.categoryIndex !== -1
+          )
+        );
+      }
+    } else {
+      const checked = event.target.checked;
+      if (checked === true) {
+        setSelectedNotes((prevSelectedNotes) => [
+          ...prevSelectedNotes,
+          {
+            title: note.title,
+            description: note.description,
+            created: note.created,
+            index: noteIndex,
+            categoryIndex: categoryIndex,
+            strictCreated: note.strictCreated
+          },
+        ]);
+      } else {
+        setSelectedNotes((prevSelectedNotes) =>
+          prevSelectedNotes.filter(
+            (selectedNote) =>
+              selectedNote.index !== noteIndex || selectedNote.categoryIndex !== categoryIndex
+          )
+        );
+      }
+    }
+  }
+
+  function moveNotes(categoryIndex) {
+    const updatedData = { ...data };
+  
+    // Helper function to find a note by comparing its properties
+    function findNoteIndex(note) {
+      return updatedData.notes.findIndex((existingNote) => {
+        return (
+          existingNote.title === note.title &&
+          existingNote.description === note.description &&
+          existingNote.strictCreated === note.strictCreated
+        );
+      });
+    }
+  
+    // Helper function to remove a note from the data object and categories
+    function removeNoteFromDataAndCategories(note) {
+      const noteIndex = findNoteIndex(note);
+      if (noteIndex !== -1) {
+        updatedData.notes.splice(noteIndex, 1);
+      }
+  
+      updatedData.categories.forEach((category) => {
+        const categoryNoteIndex = category.notes.findIndex((categoryNote) => {
+          return (
+            categoryNote.title === note.title &&
+            categoryNote.description === note.description &&
+            categoryNote.strictCreated === note.strictCreated
+          );
+        });
+        if (categoryNoteIndex !== -1) {
+          category.notes.splice(categoryNoteIndex, 1);
+        }
+      });
+    }
+  
+    if (categoryIndex === -1) {
+      selectedNotes.forEach((selectedNote) => {
+        removeNoteFromDataAndCategories(selectedNote);
+        updatedData.notes.push(selectedNote);
+      });
+    } else {
+      const selectedCategory = updatedData.categories[categoryIndex];
+      if (selectedCategory) {
+        selectedNotes.forEach((selectedNote) => {
+          removeNoteFromDataAndCategories(selectedNote);
+          selectedCategory.notes.push(selectedNote);
+        });
+      }
+    }
+  
+    setData(updatedData);
+    localStorage.setItem(notesStorageName, JSON.stringify(updatedData));
+    unCheckNotes();
+    setSelectMode(false);
+    setMoveModalVisible(false);
+  }
+  
+
+
+
   useEffect(() => {
 
     if (!localStorage.getItem(notesStorageName)) {
@@ -322,6 +455,10 @@ export default function Home() {
         setMaxNoteModalVisible(false);
         setNewCategoryModalVisible(false);
         setSharePopupVisible(false);
+        setNewCategoryNoteModalVisible(false);
+        setEditCategoryNoteModalVisible(false);
+        setMaxCategoryNoteModalVisible(false);
+        setMoveModalVisible(false);
       }
 
     });
@@ -335,6 +472,10 @@ export default function Home() {
           setMaxNoteModalVisible(false);
           setNewCategoryModalVisible(false);
           setSharePopupVisible(false);
+          setNewCategoryNoteModalVisible(false);
+          setEditCategoryNoteModalVisible(false);
+          setMaxCategoryNoteModalVisible(false);
+          setMoveModalVisible(false);
         }
       })
     })
@@ -353,29 +494,43 @@ export default function Home() {
         <h1 className={styles.title}>Notes</h1>
         <p className={styles.disclaimer}><span>There&apos;s a specifically designed notes app for code snippets, go to <Link className={styles.disclaimerLink} href="https://code-saver.vercel.app">code-saver.vercel.app</Link>, also made by me</span></p>
 
-
         <div className={styles.btnContainer}>
-          <button className={styles.createNewNoteBtn} onClick={() => setNewNoteModalVisible(true)}>
+          <button className={`${styles.createNewNoteBtn} ${selectMode === true ? styles.noClick : ''}`} onClick={() => {
+            if (selectMode === false) {
+              setNewNoteModalVisible(true);
+            }
+          }}>
             <BsPlus className={styles.btnIcon} />
             New Note
           </button>
 
-          <button className={styles.createNewNoteBtn} onClick={() => setNewCategoryModalVisible(true)}>
+          <button className={`${styles.createNewNoteBtn} ${selectMode === true ? styles.noClick : ''}`} onClick={() => {
+            if (selectMode === false) {
+              setNewCategoryModalVisible(true);
+            }
+          }}>
             <BsPlus className={styles.btnIcon} />
             New Category
           </button>
-
         </div>
 
         <div className={styles.notesContainer}>
 
           {data.categories.map((category, k) => (
-            <div key={k} className={styles.category} onClick={(e) => openCategoryContent(e, k)}>
+            <div key={k} className={`${styles.category}`} onClick={(e) => openCategoryContent(e, k)}>
               <h2 className={styles.noteTitle}>{category.name}</h2>
 
               <div className={styles.noteMethods}>
-                <BsPencilSquare className={`${styles.noteIcon} categoryIcon`} onClick={() => openEditCategoryModal(k)} />
-                <BsTrash className={`${styles.noteIcon} categoryIcon`} onClick={() => deleteCategory(k)} />
+                <BsPencilSquare className={`${styles.noteIcon} categoryIcon ${selectMode === true ? styles.noClick : ''}`} onClick={() => {
+                  if (selectMode === false) {
+                    openEditCategoryModal(k);
+                  }
+                }} />
+                <BsTrash className={`${styles.noteIcon} categoryIcon ${selectMode === true ? styles.noClick : ''}`} onClick={() => {
+                  if (selectMode === false) {
+                    deleteCategory(k);
+                  }
+                }} />
               </div>
 
               <span className={styles.divider}></span>
@@ -387,13 +542,34 @@ export default function Home() {
           {data.notes.map((note, k) => (
 
             <div key={k} className={styles.note}>
-              <h2 className={styles.noteTitle}>{note.title}<span className={styles.noteCreatedAt}>{note.created}</span></h2>
+              <h2 className={styles.noteTitle}>
+                <input className={`${styles.selectNoteCheckbox} ${selectMode === false ? styles.hiddenIcon : ''}`} data-select-note-checkbox type="checkbox" onInput={(e) => addSelectedNote(e, note, k, -1)} /> {/* -1 in the last parameter to show this is not in a category */}
+                {note.title}<span className={styles.noteCreatedAt}>{note.created}</span>
+              </h2>
 
               <div className={styles.noteMethods}>
-                <BsPencilSquare className={styles.noteIcon} onClick={() => openEditNoteModal(k)} />
-                <BsTrash className={styles.noteIcon} onClick={() => deleteNote(k)} />
-                <CgMaximizeAlt className={styles.noteIcon} onClick={() => maximizeNote(k)} />
-                <BsShare className={styles.noteIcon} onClick={() => shareNote(k)} />
+
+                <BsPencilSquare className={`${styles.noteIcon} ${selectMode === true ? styles.noClick : ''}`} onClick={() => {
+                  if (selectMode === false) {
+                    openEditNoteModal(k);
+                  }
+                }} />
+
+                <BsTrash className={`${styles.noteIcon} ${selectMode === true ? styles.noClick : ''}`} onClick={() => {
+                  if (selectMode === false) {
+                    deleteNote(k);
+                  }
+                }} />
+                <CgMaximizeAlt className={`${styles.noteIcon} ${selectMode === true ? styles.noClick : ''}`} onClick={() => {
+                  if (selectMode === false) {
+                    maximizeNote(k);
+                  }
+                }} />
+                <BsShare className={`${styles.noteIcon} ${selectMode === true ? styles.noClick : ''}`} onClick={() => {
+                  if (selectMode === false) {
+                    shareNote(k);
+                  }
+                }} />
 
               </div>
               <span className={styles.divider}></span>
@@ -439,7 +615,7 @@ export default function Home() {
 
       </div>
 
-      <div className={`${styles.maxModal} ${maxNoteModalVisible ? '' : styles.hidden}`}>
+      <div className={`${styles.maxModal} ${maxNoteModalVisible ? '' : styles.hidden}`} data-modal='true'>
 
         <div className={styles.modal}>
           <BsXLg className={styles.modalClose} onClick={() => setMaxNoteModalVisible(false)} />
@@ -450,7 +626,7 @@ export default function Home() {
 
       </div>
 
-      <div className={`${styles.sharePopup} ${sharePopupVisible ? '' : styles.hidden}`} style={{ zIndex: 999 }}>
+      <div className={`${styles.sharePopup} ${sharePopupVisible ? '' : styles.hidden}`} style={{ zIndex: 999 }} data-modal='true'>
 
         <div className={styles.modal}>
           <BsXLg className={styles.modalClose} onClick={() => setSharePopupVisible(false)} />
@@ -510,7 +686,11 @@ export default function Home() {
           <h1 className={styles.contentTitle}>{category.name}</h1>
           <p className={styles.contentBrief}>View or edit contents of this category, or <span className={styles.contentGoBack}>go back to home content</span></p>
 
-          <button className={styles.contentNewNoteBtn} onClick={() => openNewCategoryNoteModal(k)}>
+          <button className={`${styles.contentNewNoteBtn} ${selectMode === true ? styles.noClick : ''}`} onClick={() => {
+            if (selectMode === false) {
+              openNewCategoryNoteModal(k);
+            }
+          }}>
             <BsPlus />
             Add Note
           </button>
@@ -518,13 +698,16 @@ export default function Home() {
           <div className={styles.contentNoteContainer}>
             {category.notes.map((note, i) => (
               <div key={i} className={styles.note}>
-                <h2 className={styles.noteTitle}>{note.title}<span className={styles.noteCreatedAt}>{note.created}</span></h2>
+                <h2 className={styles.noteTitle}>
+                  <input className={`${styles.selectNoteCheckbox} ${selectMode === false ? styles.hiddenIcon : ''}`} data-select-note-checkbox type="checkbox" onInput={(e) => addSelectedNote(e, note, i, k)} />
+                  {note.title}<span className={styles.noteCreatedAt}>{note.created}</span>
+                </h2>
 
                 <div className={styles.noteMethods}>
-                  <BsPencilSquare className={styles.noteIcon} onClick={() => openEditCategoryNoteModal(k, i)} />
-                  <BsTrash className={styles.noteIcon} onClick={() => deleteCateogryNote(k, i)} />
-                  <CgMaximizeAlt className={styles.noteIcon} onClick={() => maximizeCategoryNote(k, i)} />
-                  <BsShare className={styles.noteIcon} onClick={() => shareCategoryNote(k, i)} />
+                  <BsPencilSquare className={`${styles.noteIcon} ${selectMode === true ? styles.noClick : ''}`} onClick={() => openEditCategoryNoteModal(k, i)} />
+                  <BsTrash className={`${styles.noteIcon} ${selectMode === true ? styles.noClick : ''}`} onClick={() => deleteCateogryNote(k, i)} />
+                  <CgMaximizeAlt className={`${styles.noteIcon} ${selectMode === true ? styles.noClick : ''}`} onClick={() => maximizeCategoryNote(k, i)} />
+                  <BsShare className={`${styles.noteIcon} ${selectMode === true ? styles.noClick : ''}`} onClick={() => shareCategoryNote(k, i)} />
 
                 </div>
                 <span className={styles.divider}></span>
@@ -568,13 +751,52 @@ export default function Home() {
 
       </div>
 
-      <div className={`${styles.maxModal} ${maxCategoryNoteModalVisible ? '' : styles.hidden}`}>
+      <div className={`${styles.maxModal} ${maxCategoryNoteModalVisible ? '' : styles.hidden}`} data-modal='true'>
 
         <div className={styles.modal}>
           <BsXLg className={styles.modalClose} onClick={() => setMaxCategoryNoteModalVisible(false)} />
 
           <h2 className={styles.noteName} id="max-modal-category-note-title"></h2>
           <ReactMarkdown className={styles.noteContent} id="max-modal-note-content">{categoryNoteMaxModalMarkdownContent}</ReactMarkdown>
+        </div>
+
+      </div>
+
+      <div className={styles.selectModeDiv}>
+
+        <button className={`${styles.moveNotesBtn} ${styles.selectModeDivBtn} ${selectMode === false || selectedNotes.length === 0 ? styles.noClick : ''}`} onClick={() => setMoveModalVisible(true)}>Move To</button> {/* checks whether the selectMode is false, then add the noClick class OR if the selected notes array is empty, meaning no notes to move anywhere, so it is still noClick. otherwise, no class. */}
+        <button className={`${styles.selectNotesBtn} ${styles.selectModeDivBtn}`} onClick={() => setSelectModeFn()}>{selectMode === true ? 'Cancel' : 'Select'}</button>
+
+      </div>
+
+      <div className={`${styles.mainModal} ${styles.moveModal} ${moveModalVisible ? '' : styles.hidden}`} data-modal='true'>
+
+        <div className={styles.modal}>
+          <BsXLg className={styles.modalClose} onClick={() => {
+            setMoveModalVisible(false);
+            setSelectedNotes([]);
+            setSelectMode(false);
+            unCheckNotes();
+          }} />
+
+          <h2 className={styles.modalTitle} id="move-modal-title">Move To...</h2>
+          <div className={styles.moveModalContentContainer} id="move-modal-content-container">
+            <span className={styles.moveModalItem} data-root-item onClick={() => moveNotes(-1)}> {/* indicates that this item is the root of the notes, no categories */}
+              <BsHouse className={styles.itemIcon} />
+              Home Category
+
+              <BsCheck2 className={styles.selectedIcon} />
+            </span>
+            {data.categories.map((category, k) => (
+              <span className={styles.moveModalItem} key={k} onClick={() => moveNotes(k)}>
+                <BsFolder className={styles.itemIcon} />
+                {category.name}
+                <BsCheck2 className={styles.selectedIcon} />
+              </span>
+            ))}
+          </div>
+
+          <span className={styles.modalDisclaimer}>Click on the desired category to move the selected notes to that category</span>
         </div>
 
       </div>
