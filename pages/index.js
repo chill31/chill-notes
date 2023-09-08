@@ -16,6 +16,7 @@ import Link from 'next/link';
 
 export default function Home() {
 
+  // function to format ISO formatted dates to readable dates.
   function formatDate() {
 
     const date = new Date();
@@ -29,33 +30,43 @@ export default function Home() {
 
   }
 
+  // the local storage name where data will be stored.
   const notesStorageName = 'chill-notes-data';
 
+  // all the notes data
   const [data, setData] = useState({ notes: [], categories: [] });
 
+  // select mode useStates to define whether notes select mode is enabled or not.
   const [selectMode, setSelectMode] = useState(false);
   const [selectedNotes, setSelectedNotes] = useState([]);
 
+  // whether the move modal (the modal where it shows to move the notes to a category) is visible or not
   const [moveModalVisible, setMoveModalVisible] = useState(false);
 
+  // the visibility useState for the 'new note', 'edit note' and 'maximized note' moddal
   const [newNoteModalVisible, setNewNoteModalVisible] = useState(false);
   const [editNoteModalVisible, setEditNoteModalVisible] = useState(false);
   const [maxNoteModalVisible, setMaxNoteModalVisible] = useState(false);
 
+  // the state for the note content to show when the note maximize button is clicked 
   const [maxModalMarkdownContent, setmaxModalMarkdownContent] = useState('');
   const [categoryNoteMaxModalMarkdownContent, setCategoryNoteMaxModalMarkdownContent] = useState('');
   const [maxCategoryNoteModalVisible, setMaxCategoryNoteModalVisible] = useState(false);
 
+  // useStates for share popup's visibility, and the share popup link to show when the content is loaded.
   const [sharePopupVisible, setSharePopupVisible] = useState(false);
   const [sharePopupLink, setSharePopupLink] = useState('');
 
+  // the share modal title and content, changes to 'Generated' when the share link is created.
   const [shareTitleContent, setShareTitleContent] = useState('Generating...');
   const [shareBriefContent, setShareBriefContent] = useState('');
 
+  // useStates()'s for new category modal, edit category modal and the name of the category shown in the category modals. 
   const [newCategoryModalVisible, setNewCategoryModalVisible] = useState(false);
   const [editCategoryModalVisible, setEditCategoryModalVisible] = useState(false);
   const [modalCategoryName, setModalCategoryName] = useState('');
 
+  // useState for new note in category modal and edit note in category modal.
   const [newCategoryNoteModalVisible, setNewCategoryNoteModalVisible] = useState(false);
   const [editCategoryNoteModalVisible, setEditCategoryNoteModalVisible] = useState(false);
 
@@ -74,6 +85,9 @@ export default function Home() {
     setData(fnData);
     localStorage.setItem(notesStorageName, JSON.stringify(fnData));
 
+
+    document.getElementById("modal-note-title-input").value = "";
+    document.getElementById("modal-note-description-input").value = "";
     setNewNoteModalVisible(false);
 
   }
@@ -94,6 +108,8 @@ export default function Home() {
     setEditNoteModalVisible(true);
 
     document.getElementById("note-name").textContent = `(${data.notes[index].title})`;
+    document.getElementById("edit-modal-note-title-input").value = data.notes[index].title;
+    document.getElementById("edit-modal-note-description-input").value = data.notes[index].description;
   }
 
   const editNote = () => {
@@ -179,10 +195,11 @@ export default function Home() {
     const name = document.getElementById("modal-category-name-input").value;
     let fnData = { ...data };
 
-    fnData.categories.push({ name: name, notes: [] });
+    fnData.categories.push({ name: name, created: formatDate(), notes: [] });
     localStorage.setItem(notesStorageName, JSON.stringify(fnData));
 
     setNewCategoryModalVisible(false);
+    document.getElementById('modal-category-name-input').value = "";
 
   }
 
@@ -202,6 +219,7 @@ export default function Home() {
     setEditCategoryModalVisible(true);
 
     setModalCategoryName(data.categories[index].name);
+    document.getElementById('edit-modal-category-name-input').value = data.categories[index].name;
 
   }
 
@@ -379,7 +397,7 @@ export default function Home() {
 
   function moveNotes(categoryIndex) {
     const updatedData = { ...data };
-  
+
     // Helper function to find a note by comparing its properties
     function findNoteIndex(note) {
       return updatedData.notes.findIndex((existingNote) => {
@@ -390,14 +408,14 @@ export default function Home() {
         );
       });
     }
-  
+
     // Helper function to remove a note from the data object and categories
     function removeNoteFromDataAndCategories(note) {
       const noteIndex = findNoteIndex(note);
       if (noteIndex !== -1) {
         updatedData.notes.splice(noteIndex, 1);
       }
-  
+
       updatedData.categories.forEach((category) => {
         const categoryNoteIndex = category.notes.findIndex((categoryNote) => {
           return (
@@ -411,7 +429,7 @@ export default function Home() {
         }
       });
     }
-  
+
     if (categoryIndex === -1) {
       selectedNotes.forEach((selectedNote) => {
         removeNoteFromDataAndCategories(selectedNote);
@@ -426,14 +444,14 @@ export default function Home() {
         });
       }
     }
-  
+
     setData(updatedData);
     localStorage.setItem(notesStorageName, JSON.stringify(updatedData));
     unCheckNotes();
     setSelectMode(false);
     setMoveModalVisible(false);
   }
-  
+
 
 
 
@@ -518,7 +536,10 @@ export default function Home() {
 
           {data.categories.map((category, k) => (
             <div key={k} className={`${styles.category}`} onClick={(e) => openCategoryContent(e, k)}>
-              <h2 className={styles.noteTitle}>{category.name}</h2>
+              <h2 className={styles.noteTitle}>
+                {category.name}
+                <span className={styles.noteCreatedAt}>{category.created}</span>
+              </h2>
 
               <div className={styles.noteMethods}>
                 <BsPencilSquare className={`${styles.noteIcon} categoryIcon ${selectMode === true ? styles.noClick : ''}`} onClick={() => {
@@ -590,10 +611,10 @@ export default function Home() {
           <BsXLg className={styles.modalClose} onClick={() => setNewNoteModalVisible(false)} />
 
           <h2 className={styles.modalTitle}>New Note</h2>
-          <input className={styles.modalInput} id="modal-note-title-input" placeholder="enter note title..." />
-          <textarea className={styles.modalInputArea} id="modal-note-description-input" placeholder="enter note description " />
+          <input className={styles.modalInput} id="modal-note-title-input" placeholder="enter note title..." tabIndex={newNoteModalVisible ? 0 : -1} />
+          <textarea className={styles.modalInputArea} id="modal-note-description-input" placeholder="enter note description " tabIndex={newNoteModalVisible ? 0 : -1} />
 
-          <button className={styles.modalBtn} onClick={addNote}>Confirm</button>
+          <button className={styles.modalBtn} onClick={addNote} tabIndex={newNoteModalVisible ? 0 : -1}>Confirm</button>
 
         </div>
 
@@ -606,10 +627,10 @@ export default function Home() {
           <BsXLg className={styles.modalClose} onClick={() => setEditNoteModalVisible(false)} />
 
           <h2 className={styles.modalTitle}>Edit Note<br /><span className={styles.noteName} id="note-name"></span></h2>
-          <input className={styles.modalInput} id="edit-modal-note-title-input" placeholder="enter note title..." />
-          <textarea className={styles.modalInputArea} id="edit-modal-note-description-input" placeholder="enter note description " />
+          <input className={styles.modalInput} id="edit-modal-note-title-input" placeholder="enter note title..." tabIndex={editNoteModalVisible ? 0 : -1} />
+          <textarea className={styles.modalInputArea} id="edit-modal-note-description-input" placeholder="enter note description " tabIndex={editNoteModalVisible ? 0 : -1} />
 
-          <button className={styles.modalBtn} onClick={editNote}>Confirm</button>
+          <button className={styles.modalBtn} onClick={editNote} tabIndex={editNoteModalVisible ? 0 : -1}>Confirm</button>
 
         </div>
 
@@ -659,8 +680,8 @@ export default function Home() {
           <BsXLg className={styles.modalClose} onClick={() => setNewCategoryModalVisible(false)} />
 
           <h2 className={styles.modalTitle}>New Category</h2>
-          <input className={styles.modalInput} id="modal-category-name-input" placeholder="enter category name..." />
-          <button className={styles.modalBtn} onClick={addCategory}>Confirm</button>
+          <input className={styles.modalInput} id="modal-category-name-input" placeholder="enter category name..." tabIndex={newCategoryModalVisible ? 0 : -1} />
+          <button className={styles.modalBtn} onClick={addCategory} tabIndex={newCategoryModalVisible ? 0 : -1}>Confirm</button>
 
         </div>
 
@@ -673,8 +694,8 @@ export default function Home() {
           <BsXLg className={styles.modalClose} onClick={() => setEditCategoryModalVisible(false)} />
 
           <h2 className={styles.modalTitle}>Edit Category<br /><span className={styles.modalCategoryName}>({modalCategoryName})</span></h2>
-          <input className={styles.modalInput} id="edit-modal-category-name-input" placeholder="enter new category name..." />
-          <button className={styles.modalBtn} onClick={editCategory}>Confirm</button>
+          <input className={styles.modalInput} id="edit-modal-category-name-input" placeholder="enter new category name..." tabIndex={editCategoryModalVisible ? 0 : -1} />
+          <button className={styles.modalBtn} onClick={editCategory} tabIndex={editCategoryModalVisible ? 0 : -1}>Confirm</button>
 
         </div>
 
@@ -726,10 +747,10 @@ export default function Home() {
           <BsXLg className={styles.modalClose} onClick={() => setNewCategoryNoteModalVisible(false)} />
 
           <h2 className={styles.modalTitle}>New Note</h2>
-          <input className={styles.modalInput} id="modal-category-note-title-input" placeholder="enter note title..." />
-          <textarea className={styles.modalInputArea} id="modal-category-note-description-input" placeholder="enter note description " />
+          <input className={styles.modalInput} id="modal-category-note-title-input" placeholder="enter note title..." tabIndex={newCategoryNoteModalVisible ? 0 : -1} />
+          <textarea className={styles.modalInputArea} id="modal-category-note-description-input" placeholder="enter note description " tabIndex={newCategoryNoteModalVisible ? 0 : -1} />
 
-          <button className={styles.modalBtn} onClick={addNoteToCategory}>Confirm</button>
+          <button className={styles.modalBtn} onClick={addNoteToCategory} tabIndex={newCategoryNoteModalVisible ? 0 : -1}>Confirm</button>
 
         </div>
 
@@ -742,10 +763,10 @@ export default function Home() {
           <BsXLg className={styles.modalClose} onClick={() => setEditCategoryNoteModalVisible(false)} />
 
           <h2 className={styles.modalTitle}>Edit Note<br /><span className={styles.noteName} id="category-note-name"></span></h2>
-          <input className={styles.modalInput} id="edit-modal-category-note-title-input" placeholder="enter note title..." />
-          <textarea className={styles.modalInputArea} id="edit-modal-category-note-description-input" placeholder="enter note description " />
+          <input className={styles.modalInput} id="edit-modal-category-note-title-input" placeholder="enter note title..." tabIndex={editCategoryNoteModalVisible ? 0 : -1} />
+          <textarea className={styles.modalInputArea} id="edit-modal-category-note-description-input" placeholder="enter note description " tabIndex={editCategoryNoteModalVisible ? 0 : -1} />
 
-          <button className={styles.modalBtn} onClick={editCategoryNote}>Confirm</button>
+          <button className={styles.modalBtn} onClick={editCategoryNote} tabIndex={editCategoryNoteModalVisible ? 0 : -1}>Confirm</button>
 
         </div>
 
