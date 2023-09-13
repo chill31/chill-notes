@@ -39,6 +39,7 @@ export default function Home() {
   // select mode useStates to define whether notes select mode is enabled or not.
   const [selectMode, setSelectMode] = useState(false);
   const [selectedNotes, setSelectedNotes] = useState([]);
+  const [selectDivVisible, setSelectDivVisible] = useState(true);
 
   // whether the move modal (the modal where it shows to move the notes to a category) is visible or not
   const [moveModalVisible, setMoveModalVisible] = useState(false);
@@ -69,6 +70,14 @@ export default function Home() {
   // useState for new note in category modal and edit note in category modal.
   const [newCategoryNoteModalVisible, setNewCategoryNoteModalVisible] = useState(false);
   const [editCategoryNoteModalVisible, setEditCategoryNoteModalVisible] = useState(false);
+
+  // Maximize (category) note modal function
+
+  function closeAllMaxNoteModals() {
+    setMaxNoteModalVisible(false);
+    setMaxCategoryNoteModalVisible(false);
+    setSelectDivVisible(true);
+  }
 
   // NOTE METHODS
 
@@ -139,6 +148,7 @@ export default function Home() {
     modalTitle.textContent = noteTitle;
     setmaxModalMarkdownContent(noteContent);
 
+    setSelectDivVisible(false);
     setMaxNoteModalVisible(true);
   }
 
@@ -324,6 +334,7 @@ export default function Home() {
     modalTitle.textContent = noteTitle;
     setCategoryNoteMaxModalMarkdownContent(noteContent);
 
+    setSelectDivVisible(false);
     setMaxCategoryNoteModalVisible(true);
   }
 
@@ -470,13 +481,12 @@ export default function Home() {
         setEditNoteModalVisible(false);
         setNewNoteModalVisible(false);
         setEditCategoryModalVisible(false);
-        setMaxNoteModalVisible(false);
         setNewCategoryModalVisible(false);
         setSharePopupVisible(false);
         setNewCategoryNoteModalVisible(false);
         setEditCategoryNoteModalVisible(false);
-        setMaxCategoryNoteModalVisible(false);
         setMoveModalVisible(false);
+        closeAllMaxNoteModals();
       }
 
     });
@@ -487,13 +497,12 @@ export default function Home() {
           setEditNoteModalVisible(false);
           setNewNoteModalVisible(false);
           setEditCategoryModalVisible(false);
-          setMaxNoteModalVisible(false);
           setNewCategoryModalVisible(false);
           setSharePopupVisible(false);
           setNewCategoryNoteModalVisible(false);
           setEditCategoryNoteModalVisible(false);
-          setMaxCategoryNoteModalVisible(false);
           setMoveModalVisible(false);
+          closeAllMaxNoteModals();
         }
       })
     })
@@ -639,7 +648,10 @@ export default function Home() {
       <div className={`${styles.maxModal} ${maxNoteModalVisible ? '' : styles.hidden}`} data-modal='true'>
 
         <div className={styles.modal}>
-          <BsXLg className={styles.modalClose} onClick={() => setMaxNoteModalVisible(false)} />
+          <BsXLg className={styles.modalClose} onClick={() => {
+            setMaxNoteModalVisible(false);
+            setSelectDivVisible(true);
+          }} />
 
           <h2 className={styles.noteName} id="max-modal-note-title"></h2>
           <ReactMarkdown className={styles.noteContent} id="max-modal-note-content">{maxModalMarkdownContent}</ReactMarkdown>
@@ -775,7 +787,10 @@ export default function Home() {
       <div className={`${styles.maxModal} ${maxCategoryNoteModalVisible ? '' : styles.hidden}`} data-modal='true'>
 
         <div className={styles.modal}>
-          <BsXLg className={styles.modalClose} onClick={() => setMaxCategoryNoteModalVisible(false)} />
+          <BsXLg className={styles.modalClose} onClick={() => {
+            setMaxCategoryNoteModalVisible(false);
+            setSelectDivVisible(true);
+          }} />
 
           <h2 className={styles.noteName} id="max-modal-category-note-title"></h2>
           <ReactMarkdown className={styles.noteContent} id="max-modal-note-content">{categoryNoteMaxModalMarkdownContent}</ReactMarkdown>
@@ -783,7 +798,7 @@ export default function Home() {
 
       </div>
 
-      <div className={styles.selectModeDiv}>
+      <div className={`${styles.selectModeDiv} ${selectDivVisible ? '' : styles.hidden}`}>
 
         <button className={`${styles.moveNotesBtn} ${styles.selectModeDivBtn} ${selectMode === false || selectedNotes.length === 0 ? styles.noClick : ''}`} onClick={() => setMoveModalVisible(true)}>Move To</button> {/* checks whether the selectMode is false, then add the noClick class OR if the selected notes array is empty, meaning no notes to move anywhere, so it is still noClick. otherwise, no class. */}
         <button className={`${styles.selectNotesBtn} ${styles.selectModeDivBtn}`} onClick={() => setSelectModeFn()}>{selectMode === true ? 'Cancel' : 'Select'}</button>
