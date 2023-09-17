@@ -546,7 +546,11 @@ export default function Home() {
           {data.categories.map((category, k) => (
             <div key={k} className={`${styles.category}`} onClick={(e) => openCategoryContent(e, k)}>
               <h2 className={styles.noteTitle}>
-                {category.name}
+                {
+                  <span>
+                    {category.name} <span className={styles.categoryNotesAmount}>({category.notes.length})</span>
+                  </span>
+                }
                 <span className={styles.noteCreatedAt}>{category.created}</span>
               </h2>
 
