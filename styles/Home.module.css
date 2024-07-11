@@ -365,7 +365,9 @@
   height: 100%;
   border-top: solid 2px black;
   width: 100%;
-  padding-left: 1rem;
+  padding-left: 2rem;
+  padding-top: 2rem;
+  font-size: 1.2rem;
 }
 
 /* share modal code */
